@@ -25,7 +25,7 @@ namespace DatingApp.Controllers
         public readonly IConfiguration _cofig;
         private readonly IMapper _mapper;
 
-        public AuthController(IAuthRepository repo, IConfiguration cofig,IMapper mapper)
+        public AuthController(IAuthRepository repo, IConfiguration cofig, IMapper mapper)
         {
             _repo = repo;
             _cofig = cofig;
@@ -36,12 +36,14 @@ namespace DatingApp.Controllers
         public async Task<IActionResult> Register(UserForRegisterDto userForRegisterDto)
         {
             userForRegisterDto.Username = userForRegisterDto.Username.ToLower();
-            if(await _repo.UserExists(userForRegisterDto.Username))
+            if (await _repo.UserExists(userForRegisterDto.Username))
                 return BadRequest("Username already exists");
 
-            var userToCreate = new User { Username = userForRegisterDto.Username };
+            var userToCreate = _mapper.Map<User>(userForRegisterDto);
             var createdUser = await _repo.Register(userToCreate, userForRegisterDto.Password);
-            return StatusCode(201);
+            var userToReturn = _mapper.Map<UserForDeatiledDto>(createdUser);
+
+            return CreatedAtRoute("GetUser", new { controller = "Users", id = createdUser.Id }, userToReturn);
         }
 
         [HttpPost("login")]

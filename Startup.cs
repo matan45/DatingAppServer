@@ -35,11 +35,13 @@ namespace DatingApp
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<DataContext>(options => options.UseSqlite(Configuration.GetConnectionString("DefaultConnection")));
-            services.AddControllers().AddNewtonsoftJson(options=> {
+            services.AddControllers().AddNewtonsoftJson(options =>
+            {
                 options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
             });
             services.AddCors();
             services.AddAutoMapper(typeof(DatingRepository).Assembly);
+            services.AddScoped<LogUserActivity>();
             services.AddScoped<IAuthRepository, AuthRepository>();
             services.Configure<CloudinarySettings>(Configuration.GetSection("CloudinaySettings"));
             services.AddScoped<IDatingRepository, DatingRepository>();
